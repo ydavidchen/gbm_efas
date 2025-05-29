@@ -6,7 +6,8 @@ software/
 *tutorial/
 .IDEA/
 .ipynb_checkpoints
-EXCLUDE*
+*EXCLUDE*
+*DEPRECATED*
 
 .DS_Store
 .DS_Store?

@@ -8,12 +8,6 @@ calc_mdi <- function(betas, ctrlBetas) {
   #'@description Wrapper to calculate Epigenetic Dysregulation (Methylation Dysregulation Index) proposed by Salas et al. Epigenet.
   #'@describedIn Chen et al. Int J Canc; O'Sullivan et al. Epigenet
   
-  if(! identical(rownames(betas), rownames(ctrlBetas)) ) {
-    univ <- intersect(rownames(betas), rownames(ctrlBetas))
-    betas <- betas[univ, ]
-    ctrlBetas <- ctrlBetas[univ, ]
-  }
-  
   stopifnot( identical(rownames(betas), rownames(ctrlBetas)) ) #checkpoint
   
   absDeviats <- abs(betas - matrixStats::rowMedians(ctrlBetas))

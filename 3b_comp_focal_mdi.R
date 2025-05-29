@@ -1,4 +1,4 @@
-# Characterize Clustering Input w/ Focal Epigenetic Dysregulation
+# Compare Focal Epigenetic Dysregulation
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
