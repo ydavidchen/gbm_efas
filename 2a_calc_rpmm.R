@@ -4,61 +4,64 @@ rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("utils.R")
 library(RPMM)
+library(seriation)
 
-get_rpmm_samp_order <- function(rpmmClusters, Y_inv, sampleIdName) {
-  #'@description Retrieves sample orders fo heat map visualization
+get_rpmm_samp_order <- function(rpmmClusters, Y_inv) {
+  #'@description Computes sample orders for heatmap visualization
   #'@describeIn  Chen et al. Int J Canc 2024
-  #'@param rpmmClusters data.frame & 1 column named "RPMM"
+  #'@param rpmmClusters data.frame w/ row.names=SampleID & 1 column named "RPMM"
   #'@param Y_inv Input matrix for RPMM computation
   
-  sampOrder <- c()
-  
+  # Extract sample order 1 RPMM cluster at a time:
+  ordered_samps <- c()
   for(cl in names(table(rpmmClusters$RPMM)) ) {
     samps <- rownames(rpmmClusters)[rpmmClusters$RPMM == cl]
-    clu <- Y_inv[rownames(Y_inv) %in% samps, ]
-    s_i <- seriation::seriate(clu, margin=2)
-    so_i <- seriation::get_order(s_i)
-    sampOrder <- c(sampOrder, samps[so_i])
+    msub <- Y_inv[samps, ]
+    s_i <- seriate(msub, margin=2)
+    so_i <- get_order(s_i)
+    ordered_samps <- c(ordered_samps, names(so_i))
   }
   
+  # Organize results:
   res <- data.frame(
-    sampleId = sampOrder,
-    RPMMSampleOrder = 1:length(sampOrder)
+    Accession = ordered_samps,
+    RPMMSampleOrder = 1:length(ordered_samps)
   )
-  colnames(res)[1] <- sampleIdName
   return(res)
 }
 
-run_custom_rpmm <- function(dnam, maxlevel=2, sampleIdName="Accession") {
+run_custom_rpmm <- function(dnam, max_level=2) {
   #'@description Wrapper to run RPMM & extract cluster info
   #'@describeIn Chen et al. Int J Canc 202
-    #'
+  
+  # Execute standard RPMM:
   Y_inv <- t(dnam)
-  res <- blcTree(Y_inv, verbose=1, maxlevel=maxlevel)
+  res <- blcTree(Y_inv, verbose=1, maxlevel=max_level)
   print(res)
   plot(res)
   
   cls <- blcTreeLeafClasses(res)
-  res_rpmm <- data.frame(table(RPMM=cls, Sample_ID=rownames(Y_inv)))
-  res_rpmm <- subset(res_rpmm, Freq != 0)
-  res_rpmm$Freq <- NULL
-  res_rpmm <- res_rpmm[ , c(2,1)]
-  colnames(res_rpmm)[1] <- sampleIdName
+  res_rpmm <- data.frame(row.names=rownames(Y_inv), RPMM=cls)
   
-  ## Extract sample order:
-  rownames(res_rpmm) <- as.character(res_rpmm[ , sampleIdName]) #for sample order helper
-  samp_order <- get_rpmm_samp_order(res_rpmm, Y_inv, sampleIdName)
-  res_rpmm <- merge(res_rpmm, samp_order, by=sampleIdName)
-  res_rpmm$Cluster <- substr(res_rpmm$RPMM, 2, 2) #just L or R
+  # Extract sample order:
+  samp_order <- get_rpmm_samp_order(res_rpmm, Y_inv)
+  
+  res_rpmm <- merge(samp_order, res_rpmm, by.x="Accession", by.y="row.names")
+  
+  # Collapse to maximum cluster leve of choice:
+  res_rpmm$Cluster <- substr(res_rpmm$RPMM, 2, max_level)
   return(res_rpmm)
 }
+
 
 ## Load cohort datasets:
 load(paste0(OUT_DIR, "tcgagbm_dnam.RData"))
 tcgaGENE <- gbmGENE
+rm(gbm450, gbmGENE, patients)
 
 load(paste0(OUT_DIR, "dkfzgbm_dnam.RData"))
 dkfzGENE <- gbmGENE
+rm(gbm450, gbmGENE, patients)
 
 ## Execute wrapper:
 tcga_rpmm <- run_custom_rpmm(tcgaGENE, 2)
