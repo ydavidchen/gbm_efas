@@ -56,3 +56,8 @@ csc_dkfz <- calc_stemness(dkfz450k, WEIGHTS)
 csc_dkfz$Cohort <- "DKFZ"
 
 # write.csv(rbind(csc_tcga, csc_dkfz), paste0(OUT_DIR, "stemness_by_cohort.csv"), row.names=TRUE, quote=FALSE)
+
+
+## Verify NO OVERLAP btwn CpGs analyzed vs. signature:
+mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #sorted by coord
+sum(mGENE$Name %in% rownames(WEIGHTS))

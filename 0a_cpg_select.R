@@ -3,7 +3,6 @@
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("utils.R")
-library(dplyr)
 
 XREACTIVE <- fread(paste0(DIR,"annotation_files/infinium_filtering/450K/48639-non-specific-probes-Illumina450k.csv"), header=TRUE, data.table=FALSE)
 

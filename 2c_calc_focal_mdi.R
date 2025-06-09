@@ -20,16 +20,18 @@ calc_mdi <- function(betas, ctrlBetas) {
   return(mdi)
 }
 
-## Reference data:
+## Normal Control data:
 load(paste0(OUT_DIR, "healthy_brain_dnam.RData"))
 ctrl450k <- pfcGENE
 
 ## Load DNAm matrices for GBM:
 load(paste0(OUT_DIR, "tcgagbm_dnam.RData"))
 tcga450k <- gbmGENE
+rm(gbm450, gbmGENE)
 
 load(paste0(OUT_DIR, "dkfzgbm_dnam.RData"))
 dkfz450k <- gbmGENE
+rm(gbm450, gbmGENE)
 
 ## Execute wrapper:
 mdi_tcga <- calc_mdi(tcga450k, ctrl450k)

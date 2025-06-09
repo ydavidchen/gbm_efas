@@ -13,6 +13,10 @@ patients <- subset(patients, histology == "Glioblastoma")
 patients$sample_title <- as.integer(gsub("SAMPLE ", "", patients$sample_title))
 rownames(patients) <- patients$histology <- patients$gradeWHO <- NULL
 
+## Load predicted sexes from IDAT files:
+biol_sexes <- read.csv(paste0(OUT_DIR, "predicted_sex_GSE103659.csv"))
+patients <- merge(patients, biol_sexes[,c(1,4)], by="Accession")
+
 ## Load all CpGs:
 gbm450 <- load_450k_from_csv(paste0(DKFZ_DIR, "GSE103659.txt"))
 gbm450 <- gbm450[cpg_shared, ]
