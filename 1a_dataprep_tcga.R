@@ -5,7 +5,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("utils.R")
 
 cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"), header=FALSE)$V2
-mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #sorted by coord
+mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #already sorted by coord
 
 # --------------- Part I: Patient- & Sample-level Clinical Metadata ---------------
 patients <- read.csv(paste0(TCGA_DIR,"GBM/nationwidechildrens.org_GBM_bio.patient.tsv"), sep="\t", na.strings=c("NA",""))
@@ -58,7 +58,7 @@ gbm450 <- gbm450[ , colnames(gbm450) %in% patients$sample]
 dim(gbm450)
 
 patients <- subset(patients, sample %in% colnames(gbm450))
-identical(patients$sample, colnames(gbm450)) #if not, match
+identical(patients$sample, colnames(gbm450)) #checkpoint: if not, match
 
 ## Subset DNAm for Gene of Interest:
 gbmGENE <- subset(gbm450, rownames(gbm450) %in% mGENE$Name)
