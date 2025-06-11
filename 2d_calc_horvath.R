@@ -8,7 +8,7 @@ library(wateRmelon)
 
 calc_horvath <- function(betas) {
   #'@description Wrapper for wateRmelon implementation of Horvath Age
-  res <- wateRmelon::agep(betas)
+  res <- wateRmelon::agep(betas, method="horvath")
   res$Accession <- rownames(res)
   rownames(res) <- NULL
   return(res[ , c(3,1)])
@@ -27,6 +27,4 @@ rm(gbm450, gbmGENE, patients)
 horvath_tcga <- calc_horvath(tcga450k)
 horvath_dkfz <- calc_horvath(dkfz450k)
 
-write.csv(rbind(horvath_tcga, horvath_dkfz), file=paste0(OUT_DIR,"horvath_by_cohort.csv"), row.names=FALSE, quote=FALSE)
-
-## Verify NO overlap btwn Signature & target loci:
+# write.csv(rbind(horvath_tcga, horvath_dkfz), file=paste0(OUT_DIR,"horvath_by_cohort.csv"), row.names=FALSE, quote=FALSE)

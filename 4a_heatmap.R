@@ -7,7 +7,9 @@ library(pheatmap)
 
 ANNOT_COLORS <- list(
   Cluster = c(L="lightgray", R="black"),
-  RPMM = c(LL="darkgreen", LR="lightgreen", RL="magenta", RR="purple")
+  RPMM = c(LL="darkgreen", LR="lightgreen", RL="magenta", RR="purple"),
+  Txn = c(TSS="black", UTR="darkgray", Body="lightgray"),
+  CGI = c(Island="black", Shore="darkgray", Shelf="lightgray")
 )
 
 wrapper_hm <- function(dnam, gaps_row=NULL, annot_row=NULL) {
