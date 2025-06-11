@@ -11,8 +11,7 @@ mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #already sorted by coord
 patients <- read.csv(paste0(TCGA_DIR,"GBM/nationwidechildrens.org_GBM_bio.patient.tsv"), sep="\t", na.strings=c("NA",""))
 colnames(patients)[1] <- "patient"
 patients$age <- as.integer(patients$age_at_initial_pathologic_diagnosis)
-patients$neoadjuvant <- patients$history_neoadjuvant_treatment == "Yes"
-patients <- patients[ , c("patient","age","gender","race","ethnicity","neoadjuvant")]
+patients <- patients[ , c("patient","age","gender")]
 patients$sexF <- patients$gender == "FEMALE"
 
 samples <- read.csv(paste0(TCGA_DIR,"GBM/nationwidechildrens.org_GBM_bio.sample.tsv"), sep="\t")

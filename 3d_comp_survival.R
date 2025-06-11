@@ -18,13 +18,11 @@ cls <- read.csv(paste0(OUT_DIR,"rpmm_by_cohort.csv"))
 
 if(COHORT == "TCGA") {
   load(paste0(OUT_DIR, "tcgagbm_dnam.RData"))
-  patients$genderF <- patients$gender == "FEMALE"
-  cls <- merge(patients, cls, by.x="sample", by.y="Accession") #TCGA
 } else if (COHORT == "DKFZ") {
   load(paste0(OUT_DIR, "dkfzgbm_dnam.RData"))
-  patients$genderF <- patients$sex == "F"
-  cls <- merge(patients, cls, by="Accession") #DKFZ
+  
 }
+cls <- merge(patients, cls, by="Accession")
 rm(gbm450, gbmGENE, patients)
 
 ## Administrative censoring:
@@ -39,6 +37,6 @@ surv_pvalue(os_univar) #log-rank test
 ggsurvplot(os_univar, cls, palette=SURV_COLS, ggtheme=THEME_SURV, pval=FALSE, risk.table=FALSE)
 
 ## Cox Model:
-os_multi <- coxph(Surv(os_months, os_status)~Cluster+age+genderF, data=cls)
+os_multi <- coxph(Surv(os_months, os_status)~Cluster+age+sexF, data=cls)
 summary(os_multi)
 exp(cbind(HR=coef(os_multi), confint(os_multi))) #HR
