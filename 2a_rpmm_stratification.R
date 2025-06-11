@@ -70,4 +70,4 @@ tcga_rpmm$Cohort <- "TCGA"
 dkfz_rpmm <- run_custom_rpmm(dkfzGENE, 2)
 dkfz_rpmm$Cohort <- "DKFZ"
 
-# write.csv(rbind(tcga_rpmm, dkfz_rpmm), paste0(OUT_DIR, "rpmm_by_cohort.csv"), row.names=FALSE, quote=FALSE)
+write.csv(rbind(tcga_rpmm, dkfz_rpmm), paste0(OUT_DIR, "rpmm_by_cohort.csv"), row.names=FALSE, quote=FALSE)

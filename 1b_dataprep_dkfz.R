@@ -4,7 +4,7 @@ rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("utils.R")
 
-cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"), header=FALSE)$V2
+cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"))$V1
 mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #already sorted by coord
 
 ## Clinical covariates:
@@ -29,14 +29,14 @@ gbm450 <- load_450k_from_csv(paste0(DKFZ_DIR, "GSE103659.txt"))
 gbm450 <- gbm450[cpg_shared, ]
 dim(gbm450)
 
-## Impute missing, if needed:
-sum(is.na(gbm450))
-# gbm450 <- impute::impute.knn(gbm450)$data #not needed
-
 ## Standardize-Match samples:
 patients <- subset(patients, Accession %in% colnames(gbm450))
 gbm450 <- gbm450[ , colnames(gbm450) %in% patients$Accession]
 identical(colnames(gbm450), patients$Accession) #checkpoint
+
+## Impute missing, if needed:
+100 * mean(is.na(gbm450))
+gbm450 <- impute::impute.knn(gbm450)$data
 
 ## Subset DNAm to Gene of Interest:
 gbmGENE <- subset(gbm450, rownames(gbm450) %in% mGENE$Name)
@@ -44,8 +44,8 @@ mGENE <- subset(mGENE, Name %in% rownames(gbmGENE))
 gbmGENE <- gbmGENE[match(mGENE$Name, rownames(gbmGENE)), ]
 identical(mGENE$Name, rownames(gbmGENE)) #checkpoint
 
-# save(
-#   list = c("patients", "gbm450", "gbmGENE"),
-#   file = paste0(OUT_DIR, "dkfzgbm_dnam.RData"),
-#   compress = TRUE
-# )
+save(
+  list = c("patients", "gbm450", "gbmGENE"),
+  file = paste0(OUT_DIR, "dkfzgbm_dnam.RData"),
+  compress = TRUE
+)

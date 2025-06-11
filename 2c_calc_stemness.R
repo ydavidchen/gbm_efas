@@ -38,15 +38,17 @@ WEIGHTS$`Probe ID` <- NULL
 WEIGHTS <- data.matrix(WEIGHTS)
 
 ## Shared loci:
-cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"), header=FALSE)$V2
-sum(cpg_shared %in% rownames(WEIGHTS))
+cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"))$V1
+sum(cpg_shared %in% rownames(WEIGHTS)) #205
 
 ## Load DNAm matrices for GBM:
 load(paste0(OUT_DIR, "tcgagbm_dnam.RData"))
 tcga450k <- gbm450
+rm(gbm450, gbmGENE, patients)
 
 load(paste0(OUT_DIR, "dkfzgbm_dnam.RData"))
 dkfz450k <- gbm450
+rm(gbm450, gbmGENE, patients)
 
 ## Execute wrapper:
 csc_tcga <- calc_stemness(tcga450k, WEIGHTS)
@@ -55,8 +57,7 @@ csc_tcga$Cohort <- "TCGA"
 csc_dkfz <- calc_stemness(dkfz450k, WEIGHTS)
 csc_dkfz$Cohort <- "DKFZ"
 
-# write.csv(rbind(csc_tcga, csc_dkfz), paste0(OUT_DIR, "stemness_by_cohort.csv"), row.names=TRUE, quote=FALSE)
-
+write.csv(rbind(csc_tcga, csc_dkfz), paste0(OUT_DIR, "stemness_by_cohort.csv"), row.names=TRUE, quote=FALSE)
 
 ## Verify NO OVERLAP btwn CpGs analyzed vs. signature:
 mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #sorted by coord

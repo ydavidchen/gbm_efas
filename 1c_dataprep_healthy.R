@@ -1,10 +1,10 @@
-# Cerebella & PFCs from Non-diseased Controls
+# PFCs from Non-diseased Controls
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("utils.R")
 
-cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"), header=FALSE)$V2
+cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"))$V1
 mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #sorted by coord
 
 ## Load & filter clinical data:
@@ -23,15 +23,19 @@ dim(pfc450)
 patients <- subset(patients, barcode %in% colnames(pfc450))
 patients <- patients[match(colnames(pfc450), patients$barcode), ]
 
-stopifnot( identical(colnames(pfc450), patients$barcode) )
+identical(colnames(pfc450), patients$barcode)
 colnames(pfc450) <- patients$subject_id #only possible if 1 disease & 1 tissue type selected!
+
+## Impute missing, if needed:
+100 * mean(is.na(pfc450))
+pfc450 <- impute::impute.knn(pfc450)$data
 
 ## DNAm for Gene of Interest:
 pfcGENE <- subset(pfc450, rownames(pfc450) %in% mGENE$Name)
 pfcGENE <- pfcGENE[match(mGENE$Name, rownames(pfcGENE)), ]
 
-# save(
-#   list = c("patients", "pfc450", "pfcGENE"),
-#   file = paste0(OUT_DIR, "healthy_brain_dnam.RData"),
-#   compress = TRUE
-# )
+save(
+  list = c("patients", "pfc450", "pfcGENE"),
+  file = paste0(OUT_DIR, "healthy_brain_dnam.RData"),
+  compress = TRUE
+)

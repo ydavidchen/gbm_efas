@@ -23,8 +23,16 @@ load(paste0(OUT_DIR, "dkfzgbm_dnam.RData"))
 dkfz450k <- gbm450
 rm(gbm450, gbmGENE, patients)
 
-## Execute wrapper (ref. Chen et al. 2019)
+## Execute wrapper:
 horvath_tcga <- calc_horvath(tcga450k)
 horvath_dkfz <- calc_horvath(dkfz450k)
 
-# write.csv(rbind(horvath_tcga, horvath_dkfz), file=paste0(OUT_DIR,"horvath_by_cohort.csv"), row.names=FALSE, quote=FALSE)
+write.csv(rbind(horvath_tcga, horvath_dkfz), file=paste0(OUT_DIR,"horvath_by_cohort.csv"), row.names=FALSE, quote=FALSE)
+
+## Check number of probes used:
+HLIST <- read.csv(paste0(DIR,"annotation_files/horvath353.csv"))
+sum(rownames(tcga450k) %in% HLIST$CpGmarker)
+
+## Ensure no overlaps:
+mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #sorted by coord
+sum(mGENE$Name %in% HLIST$CpGmarker)
