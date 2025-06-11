@@ -1,43 +1,41 @@
-# Compare Stemness Index between Clusters
-# Note sample size reduction in TCGA due to missing covariates
+# Compare Focal Epigenetic Dysregulation
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("utils.R")
 
-## Load computed profiles:
+## Visualization:
 cls <- read.csv(paste0(OUT_DIR,"rpmm_by_cohort.csv"))
+mdi <- read.csv(paste0(OUT_DIR, "mdi_by_cohort.csv"))
+mdi$Cohort <- NULL
 
-stem <- read.csv(paste0(OUT_DIR, "stemness_by_cohort.csv"))
-stem$Cohort <- NULL
+df <- merge(cls, mdi, by="Accession")
+df$Cohort <- forcats::fct_rev(df$Cohort)
 
-df <- merge(cls, stem, by.x="Accession", by.y="X")
-
-ggplot(df, aes(Cluster, mDNAsi)) +
+ggplot(df, aes(Cluster, 100*MDI)) +
   geom_boxplot(outlier.shape=NA) +
   geom_jitter(width=0.25) +
-  facet_wrap(~ Cohort) + 
+  facet_wrap(~ Cohort) +
+  ylab(paste("% Dysregulation at", GENE)) +
   THEME_BOX
 
-## Univariate:
-t.test(mDNAsi ~ Cluster, data=subset(df, Cohort=="TCGA"))
-t.test(mDNAsi ~ Cluster, data=subset(df, Cohort=="DKFZ"))
+## Univariate tests:
+t.test(MDI ~ Cluster, data=subset(df, Cohort=="TCGA"))
+t.test(MDI ~ Cluster, data=subset(df, Cohort=="DKFZ"))
 
-## Multivariate:
+## Multivariate tests:
 wrapper_mult <- function(cohort) {
   if(cohort == "TCGA") {
     load(paste0(OUT_DIR, "tcgagbm_dnam.RData"))
   } else if (cohort == "DKFZ") {
     load(paste0(OUT_DIR, "dkfzgbm_dnam.RData"))
-  } else {
-    stop("Cohort name NOT FOUND!")
   }
   
-  mdf <- merge(patients, df, by="Accession") #DKFZ
+  mdf <- merge(patients, df, by="Accession")
   n <- nrow(mdf)
-  mdf <- mdf[ , c("mDNAsi","Cluster","age","sexF")]
+  mdf <- mdf[ , c("MDI","Cluster","age","sexF")]
   mdf <- mdf[complete.cases(mdf), ]
-  mod <- glm(mDNAsi ~ (Cluster=="R")+age+sexF, data=mdf, family=gaussian)
+  mod <- glm(MDI ~ (Cluster=="R")+age+sexF, data=mdf, family=gaussian)
   n_sub <- nrow(mdf)
   
   cat("-------------- GLM on ", cohort, "n =", n_sub, "of", n, "--------------")

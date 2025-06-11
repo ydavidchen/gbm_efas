@@ -23,9 +23,13 @@ rm(gbm450, gbmGENE, patients)
 pdat_dkfz <- merge(pdat_dkfz, cls, by="Accession")
 pdat_dkfz <- merge(pdat_dkfz, horvath, by="Accession")
 
-## Chronological Age vs. DNAmA
-COL_SELE <- c("Accession","Cohort", "Cluster", "age", "horvath.age")
+## Shared object:
+COL_SELE <- c("Accession","Cohort", "sexF", "Cluster", "age", "horvath.age")
 df <- rbind(pdat_tcga[,COL_SELE], pdat_dkfz[,COL_SELE])
+df$Sex <- ifelse(df$sexF, "Female", "Male")
+df$sexF <- NULL
+
+# --------------------------------- Chronological vs. Horvath Age ---------------------------------
 mDf <- melt(df)
 mDf$Cohort <- forcats::fct_rev(mDf$Cohort)
 mDf$variable <- gsub(".age", "", mDf$variable, fixed=TRUE)
@@ -42,10 +46,15 @@ ggplot(mDf, aes(variable, value, color=Cluster)) +
 ## Statistical test:
 t.test(age ~ Cluster, data=subset(df, Cohort=="TCGA")) #for tableone
 t.test(horvath.age ~ Cluster, data=subset(df, Cohort=="TCGA"))
+summary(glm(horvath.age ~ Cluster+(Sex=="Female"), data=subset(df, Cohort=="TCGA")))
 
-## Statistical test:
 t.test(age ~ Cluster, data=subset(df, Cohort=="DKFZ")) #for tableone
 t.test(horvath.age ~ Cluster, data=subset(df, Cohort=="DKFZ"))
+summary(glm(horvath.age ~ Cluster+(Sex=="Female"), data=subset(df, Cohort=="DKFZ")))
 
-## TODO: Age Acceleration
-
+# --------------------------------- Age Acceleration ---------------------------------
+ggplot(df, aes(age, horvath.age, color=Cluster)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE) +
+  facet_wrap(~ Cohort) + 
+  THEME_SCATTER

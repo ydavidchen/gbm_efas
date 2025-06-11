@@ -20,8 +20,8 @@ if(COHORT == "TCGA") {
   load(paste0(OUT_DIR, "tcgagbm_dnam.RData"))
 } else if (COHORT == "DKFZ") {
   load(paste0(OUT_DIR, "dkfzgbm_dnam.RData"))
-  
 }
+
 cls <- merge(patients, cls, by="Accession")
 rm(gbm450, gbmGENE, patients)
 
@@ -39,4 +39,4 @@ ggsurvplot(os_univar, cls, palette=SURV_COLS, ggtheme=THEME_SURV, pval=FALSE, ri
 ## Cox Model:
 os_multi <- coxph(Surv(os_months, os_status)~Cluster+age+sexF, data=cls)
 summary(os_multi)
-exp(cbind(HR=coef(os_multi), confint(os_multi))) #HR
+exp(cbind(HR=coef(os_multi), confint(os_multi))) #HR & its CI

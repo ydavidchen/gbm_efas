@@ -5,11 +5,13 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("utils.R")
 library(pheatmap)
 
+mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv"), row.names=1)
+mGENE$Context <- gsub("[N|S]_", "", mGENE$Relation_to_UCSC_CpG_Island)
+
 ANNOT_COLORS <- list(
   Cluster = c(L="lightgray", R="black"),
   RPMM = c(LL="darkgreen", LR="lightgreen", RL="magenta", RR="purple"),
-  Txn = c(TSS="black", UTR="darkgray", Body="lightgray"),
-  CGI = c(Island="black", Shore="darkgray", Shelf="lightgray")
+  Context = c(Island="black", Shore="darkgray", Shelf="lightgray", OpenSea="lightblue")
 )
 
 wrapper_hm <- function(dnam, gaps_row=NULL, annot_row=NULL) {
@@ -20,6 +22,7 @@ wrapper_hm <- function(dnam, gaps_row=NULL, annot_row=NULL) {
     cluster_cols = FALSE,
     gaps_row = gaps_row,
     annotation_row = annot_row,
+    annotation_col = mGENE[ , "Context",drop=FALSE],
     annotation_colors = ANNOT_COLORS,
     color = HEAT_COLS,
     fontsize = 10,
@@ -51,11 +54,16 @@ cls_dkfz <- subset(cls, Cohort == "DKFZ")
 cls_dkfz <- cls_dkfz[order(cls_dkfz$RPMMSampleOrder), ]
 dkfzGENE <- dkfzGENE[ , cls_dkfz$Accession]
 
-## Main visualization:
-wrapper_hm(tcgaGENE, 73, cls_tcga[,"Cluster",drop=FALSE]) #c(11, 74, 124)-1
-wrapper_hm(dkfzGENE, 115, cls_dkfz[,"Cluster",drop=FALSE]) #c(63, 116, 149)-1
+## Main figure:
+table(cls_tcga$Cluster)[1] #61
+table(cls_dkfz$Cluster)[1] #109
 
-## Supplemental visualization:
-wrapper_hm(tcgaGENE, c(11, 74, 124)-1, cls_tcga[,c("RPMM","Cluster")])
-wrapper_hm(dkfzGENE, c(63, 116, 149)-1, cls_dkfz[,c("RPMM","Cluster")])
+wrapper_hm(tcgaGENE, 61, cls_tcga[,"Cluster",drop=FALSE]) 
+wrapper_hm(dkfzGENE, 109, cls_dkfz[,"Cluster",drop=FALSE]) 
 
+## Supplemental figure with terminal RPMM solutions:
+cumsum(table(cls_tcga$RPMM)[1:3]) #29  61 128 
+cumsum(table(cls_dkfz$RPMM)[1:3]) #60 109 147
+
+wrapper_hm(tcgaGENE, c(29, 61, 128), cls_tcga[,c("RPMM","Cluster")])
+wrapper_hm(dkfzGENE, c(60, 109, 147), cls_dkfz[,c("RPMM","Cluster")])
