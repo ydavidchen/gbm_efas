@@ -1,11 +1,9 @@
 # Biological Sex Prediction from IDAT Files
-# Notes: 
-# Only DKFZ tumors needed
+# Notes: Only DKFZ tumors needed
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("utils.R")
-
 library(minfi)
 
 BASENAME <- paste0(DKFZ_DIR,"GSE103659_RAW/")

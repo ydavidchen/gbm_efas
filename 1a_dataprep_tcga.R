@@ -12,36 +12,30 @@ patients <- read.csv(paste0(TCGA_DIR,"GBM/nationwidechildrens.org_GBM_bio.patien
 colnames(patients)[1] <- "patient"
 patients$age <- as.integer(patients$age_at_initial_pathologic_diagnosis)
 patients$neoadjuvant <- patients$history_neoadjuvant_treatment == "Yes"
-patients <- patients[ , c("patient","age","gender","race","ethnicity")]
+patients <- patients[ , c("patient","age","gender","race","ethnicity","neoadjuvant")]
+patients$sexF <- patients$gender == "FEMALE"
 
 samples <- read.csv(paste0(TCGA_DIR,"GBM/nationwidechildrens.org_GBM_bio.sample.tsv"), sep="\t")
+colnames(samples)[1] <- "Accession"
 samples <- subset(samples, sample_type %in% c("Primary Tumor","Recurrent Tumor"))
-samples <- samples[ , c("sample","sample_type")]
-samples$patient <- substr(samples$sample, 1, 12)
+samples <- samples[ , c("Accession","sample_type")]
+samples$patient <- substr(samples$Accession, 1, 12)
 
 patients <- merge(samples, patients, by="patient")
-patients$SAMPLE_ID <- substr(patients$sample, 1, 15) #for cbio
+patients$SAMPLE_ID <- substr(patients$Accession, 1, 15) #for cbio
 
 cbio <- read.csv(paste0(CBIO_DIR,"gbm_tcga_pan_can_atlas_2018_clinical_data.tsv"), sep="\t", check.names=FALSE)
-
 cbio$os_months <- as.numeric(cbio$`Overall Survival (Months)`)
 cbio$os_status <- as.integer(gsub(":.*", "", cbio$`Overall Survival Status`))
-
-cbio$pfs_months <- as.numeric(cbio$`Progress Free Survival (Months)`)
-cbio$pfs_status <- as.integer(gsub(":.*", "", cbio$`Progression Free Status`))
-
-cbio <- cbio[ , c("Sample ID","Neoplasm Histologic Grade","Subtype", "TMB (nonsynonymous)", "Fraction Genome Altered",
-                  "os_months","os_status", "pfs_months","pfs_status")]
-
-cbio$Subtype <- toupper(gsub("GBM|_", "", cbio$Subtype))
-cbio$Subtype[cbio$Subtype==""] <- NA
-cbio$IDH <- NA
-cbio$IDH[cbio$Subtype=="IDHMUT-NON-CODEL"] <- TRUE
-cbio$IDH[cbio$Subtype=="IDHWT"] <- FALSE
+cbio <- cbio[ , c("Sample ID","Subtype","Fraction Genome Altered","os_months","os_status")]
 
 patients <- merge(patients, cbio, by.x="SAMPLE_ID", by.y="Sample ID")
 patients$SAMPLE_ID <- NULL
-anyDuplicated(patients$sample)
+
+mgmt <- read.csv(paste0(OUT_DIR,"MGMT_by_cohort.csv"))[ , c("Accession","mMGMT")]
+patients <- merge(patients, mgmt, by="Accession")
+
+anyDuplicated(patients$Accession)
 
 # --------------- Part II. CpG Matrices ---------------
 gbm450 <- load_450k_from_csv(paste0(TCGA_DIR,"GBM/jhu-usc.edu_GBM_HumanMethylation450.betaValue.tsv"))
@@ -54,16 +48,16 @@ gbm450 <- impute::impute.knn(gbm450)$data
 ## Standardize sample names:
 anyDuplicated(substr(colnames(gbm450), 1, 16))
 colnames(gbm450) <- substr(colnames(gbm450), 1, 16)
-gbm450 <- gbm450[ , colnames(gbm450) %in% patients$sample]
+gbm450 <- gbm450[ , colnames(gbm450) %in% patients$Accession]
 dim(gbm450)
 
-patients <- subset(patients, sample %in% colnames(gbm450))
-identical(patients$sample, colnames(gbm450)) #checkpoint: if not, match
+patients <- subset(patients, Accession %in% colnames(gbm450))
+identical(patients$Accession, colnames(gbm450)) #checkpoint: if not, match
 
 ## Subset DNAm for Gene of Interest:
 gbmGENE <- subset(gbm450, rownames(gbm450) %in% mGENE$Name)
 mGENE <- subset(mGENE, Name %in% rownames(gbm450))
-identical(mGENE$Name, rownames(gbmGENE))
+identical(mGENE$Name, rownames(gbmGENE)) #checkpoint: if not, match
 gbmGENE <- gbmGENE[match(mGENE$Name, rownames(gbmGENE)), ]
 
 # save(

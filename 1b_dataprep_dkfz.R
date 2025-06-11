@@ -13,9 +13,16 @@ patients <- subset(patients, histology == "Glioblastoma")
 patients$sample_title <- as.integer(gsub("SAMPLE ", "", patients$sample_title))
 rownames(patients) <- patients$histology <- patients$gradeWHO <- NULL
 
-## Load predicted sexes from IDAT files:
+## Add in predicted sexes from IDAT files:
 biol_sexes <- read.csv(paste0(OUT_DIR, "predicted_sex_GSE103659.csv"))
 patients <- merge(patients, biol_sexes[,c(1,4)], by="Accession")
+patients$sexF <- patients$sex == "F"
+
+## Add in newly predicted MGMT status:
+mgmt <- read.csv(paste0(OUT_DIR,"MGMT_by_cohort.csv"))[ , c("Accession","mMGMT")]
+patients <- merge(patients, mgmt, by="Accession")
+table(patients$mgmt_status=="methylated", patients$mMGMT) #compare w/ Check with previously published
+patients$mgmt_status <- NULL
 
 ## Load all CpGs:
 gbm450 <- load_450k_from_csv(paste0(DKFZ_DIR, "GSE103659.txt"))
