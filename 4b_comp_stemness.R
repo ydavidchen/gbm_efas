@@ -34,9 +34,9 @@ wrapper_mult <- function(cohort) {
   
   mdf <- merge(patients, df, by="Accession")
   n <- nrow(mdf)
-  mdf <- mdf[ , c("mDNAsi","Cluster","age","sexF")]
+  mdf <- mdf[ , c("mDNAsi","Cluster","age","sexF","mMGMT")]
   mdf <- mdf[complete.cases(mdf), ]
-  mod <- glm(mDNAsi ~ (Cluster=="R")+age+sexF, data=mdf, family=gaussian)
+  mod <- glm(mDNAsi ~ (Cluster=="R")+age+sexF+mMGMT, data=mdf, family=gaussian)
   n_sub <- nrow(mdf)
   
   cat("-------------- GLM on ", cohort, "n =", n_sub, "of", n, "--------------")

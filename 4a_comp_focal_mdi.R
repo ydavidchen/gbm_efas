@@ -1,4 +1,4 @@
-# Compare Focal Epigenetic Dysregulation
+# Compare Focal Epigenetic Alteration
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -16,7 +16,7 @@ ggplot(df, aes(Cluster, 100*MDI)) +
   geom_boxplot(outlier.shape=NA) +
   geom_jitter(width=0.25) +
   facet_wrap(~ Cohort) +
-  ylab(paste("% Dysregulation at", GENE)) +
+  ylab(paste("% Epi Alteration at", GENE)) +
   THEME_BOX
 
 ## Univariate tests:
@@ -33,9 +33,9 @@ wrapper_mult <- function(cohort) {
   
   mdf <- merge(patients, df, by="Accession")
   n <- nrow(mdf)
-  mdf <- mdf[ , c("MDI","Cluster","age","sexF")]
+  mdf <- mdf[ , c("MDI","Cluster","age","sexF","mMGMT")]
   mdf <- mdf[complete.cases(mdf), ]
-  mod <- glm(MDI ~ (Cluster=="R")+age+sexF, data=mdf, family=gaussian)
+  mod <- glm(MDI ~ (Cluster=="R")+age+sexF+mMGMT, data=mdf, family=gaussian)
   n_sub <- nrow(mdf)
   
   cat("-------------- GLM on ", cohort, "n =", n_sub, "of", n, "--------------")

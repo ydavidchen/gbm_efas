@@ -1,4 +1,4 @@
-# Calculate Focal Methylation Dysregulation
+# Calculate Focal Epigenetic Dysregulation
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -41,4 +41,4 @@ mdi_tcga$Cohort <- "TCGA"
 mdi_dkfz <- calc_mdi(dkfz450k, ctrl450k)
 mdi_dkfz$Cohort <- "DKFZ"
 
-write.csv(rbind(mdi_tcga, mdi_dkfz), paste0(OUT_DIR,"mdi_by_cohort.csv"), row.names=FALSE, quote=FALSE)
+# write.csv(rbind(mdi_tcga, mdi_dkfz), paste0(OUT_DIR,"mdi_by_cohort.csv"), row.names=FALSE, quote=FALSE)

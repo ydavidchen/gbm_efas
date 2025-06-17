@@ -1,4 +1,7 @@
-# MGMT Promoter Methylation/Subtype
+# MGMT Promoter Methylation Status
+# Notes:
+# 1. Obtain the necessary input CpGs from scratch, i.e. non-filtered datasets
+# 2. Both CpGs needed for prediction are available.
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))

@@ -22,7 +22,7 @@ wrapper_hm <- function(dnam, gaps_row=NULL, annot_row=NULL) {
     cluster_cols = FALSE,
     gaps_row = gaps_row,
     annotation_row = annot_row,
-    annotation_col = mGENE[ , "Context",drop=FALSE],
+    annotation_col = mGENE[ , "Context", drop=FALSE],
     annotation_colors = ANNOT_COLORS,
     color = HEAT_COLS,
     fontsize = 10,
@@ -55,15 +55,15 @@ cls_dkfz <- cls_dkfz[order(cls_dkfz$RPMMSampleOrder), ]
 dkfzGENE <- dkfzGENE[ , cls_dkfz$Accession]
 
 ## Main figure:
-table(cls_tcga$Cluster)[1] #61
+table(cls_tcga$Cluster)[1] #60
 table(cls_dkfz$Cluster)[1] #109
 
-wrapper_hm(tcgaGENE, 61, cls_tcga[,"Cluster",drop=FALSE]) 
+wrapper_hm(tcgaGENE, 60, cls_tcga[,"Cluster",drop=FALSE]) 
 wrapper_hm(dkfzGENE, 109, cls_dkfz[,"Cluster",drop=FALSE]) 
 
 ## Supplemental figure with terminal RPMM solutions:
-cumsum(table(cls_tcga$RPMM)[1:3]) #29  61 128 
+cumsum(table(cls_tcga$RPMM)[1:3]) #24  60 118 
 cumsum(table(cls_dkfz$RPMM)[1:3]) #60 109 147
 
-wrapper_hm(tcgaGENE, c(29, 61, 128), cls_tcga[,c("RPMM","Cluster")])
+wrapper_hm(tcgaGENE, c(24, 60, 118), cls_tcga[,c("RPMM","Cluster")])
 wrapper_hm(dkfzGENE, c(60, 109, 147), cls_dkfz[,c("RPMM","Cluster")])
