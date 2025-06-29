@@ -1,4 +1,4 @@
-#  Brain-specific TME & TIME Deconvolution
+#  Brain-specific Cell-type Deconvolution
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -10,6 +10,7 @@ library(pheatmap)
 ## Load annotation & reference data:
 data(brain_sig_matrix)
 data(celltype_anno)
+
 cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"))$V1 #excludes gene of interest & MGMT
 
 ## Get universe & subset reference data:

@@ -35,7 +35,7 @@ ggplot(purity, aes(Cluster, Tumor)) +
   facet_wrap(~ Cohort) + 
   THEME_BOX
 
-# ----------------------- Neuronal-Stromal Fraction -----------------------
+# ----------------------- Tumor MicroEnv (TME) Fraction -----------------------
 mat_tme <- celltypes[c("Astrocyte","Dura","Microglia","Neuron","Oligodendrocyte","Endothelium"), ]
 eda_wrapper(mat_tme[ , 1:153])
 eda_wrapper(mat_tme[ , 154:ncol(mat_tme)])
@@ -80,7 +80,7 @@ wrapper_mult <- function(cohort) {
 wrapper_mult("TCGA")
 wrapper_mult("DKFZ")
 
-# ----------------------- Immune Fraction -----------------------
+# ----------------------- Tumor Immune MicroEnv (TME) Fraction -----------------------
 ## Total Immune infiltration:
 tils <- celltypes[c("CD4Tcells","CD8Tcells","Bcells","NKcells","Monocytes","Granulocytes","Neutrophils"), ]
 eda_wrapper(tils[ , 1:153])

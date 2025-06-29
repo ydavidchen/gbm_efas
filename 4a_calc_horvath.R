@@ -31,7 +31,7 @@ horvath_dkfz <- calc_horvath(dkfz450k)
 
 ## Check number of probes used:
 HLIST <- read.csv(paste0(DIR,"annotation_files/horvath353.csv"))
-sum(rownames(tcga450k) %in% HLIST$CpGmarker)
+sum(rownames(tcga450k) %in% HLIST$CpGmarker) #323
 
 ## Ensure no overlap:
 mGENE <- read.csv(paste0(OUT_DIR,"CpGs_GENE.csv")) #sorted by coord

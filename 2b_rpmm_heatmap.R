@@ -55,15 +55,15 @@ cls_dkfz <- cls_dkfz[order(cls_dkfz$RPMMSampleOrder), ]
 dkfzGENE <- dkfzGENE[ , cls_dkfz$Accession]
 
 ## Main figure:
-table(cls_tcga$Cluster)[1] #60
+table(cls_tcga$Cluster)[1] #61
 table(cls_dkfz$Cluster)[1] #109
 
-wrapper_hm(tcgaGENE, 60, cls_tcga[,"Cluster",drop=FALSE]) 
+wrapper_hm(tcgaGENE, 61, cls_tcga[,"Cluster",drop=FALSE]) 
 wrapper_hm(dkfzGENE, 109, cls_dkfz[,"Cluster",drop=FALSE]) 
 
 ## Supplemental figure with terminal RPMM solutions:
-cumsum(table(cls_tcga$RPMM)[1:3]) #24  60 118 
+cumsum(table(cls_tcga$RPMM)[1:3]) #31  61 128 
 cumsum(table(cls_dkfz$RPMM)[1:3]) #60 109 147
 
-wrapper_hm(tcgaGENE, c(24, 60, 118), cls_tcga[,c("RPMM","Cluster")])
+wrapper_hm(tcgaGENE, c(31, 61, 128), cls_tcga[,c("RPMM","Cluster")])
 wrapper_hm(dkfzGENE, c(60, 109, 147), cls_dkfz[,c("RPMM","Cluster")])

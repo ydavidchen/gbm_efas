@@ -39,7 +39,7 @@ WEIGHTS <- data.matrix(WEIGHTS)
 
 ## Shared loci:
 cpg_shared <- read.table(paste0(OUT_DIR,"CpGs_all_shared.csv"))$V1
-sum(cpg_shared %in% rownames(WEIGHTS)) #205
+sum(cpg_shared %in% rownames(WEIGHTS)) #212
 
 ## Load DNAm matrices for GBM:
 load(paste0(OUT_DIR, "tcgagbm_dnam.RData"))

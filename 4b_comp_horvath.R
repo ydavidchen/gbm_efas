@@ -25,21 +25,23 @@ pdat_dkfz <- merge(pdat_dkfz, cls, by="Accession")
 pdat_dkfz <- merge(pdat_dkfz, horvath, by="Accession")
 
 ## Shared object for tests:
-COL_SELE <- c("Accession","Cohort", "sexF", "Cluster", "age", "horvath.age")
+COL_SELE <- c("Accession","Cohort", "sexF", "Cluster", "age", "horvath.age","mMGMT")
 df <- rbind(pdat_tcga[,COL_SELE], pdat_dkfz[,COL_SELE])
+
+wrapper <- function(df) {
+  mod <- glm(horvath.age ~ (Cluster=="R")+sexF+mMGMT, data=df, family=gaussian)
+  print(summary(mod))
+  print( rbind(cbind(adjDiff=coef(mod), confint(mod))) )
+}
 
 # ----------------------------- Uni & Multivariate Tests -----------------------------
 ## TCGA:
-t.test(age ~ Cluster, data=subset(df, Cohort=="TCGA")) #show in Table 1
-
 t.test(horvath.age ~ Cluster, data=subset(df, Cohort=="TCGA"))
-summary(glm(horvath.age ~ Cluster+sexF+mMGMT, data=subset(df, Cohort=="TCGA")))
+wrapper(subset(df, Cohort=="TCGA"))
 
 ## DKFZ
-t.test(age ~ Cluster, data=subset(df, Cohort=="DKFZ")) #show in Table 1
-
 t.test(horvath.age ~ Cluster, data=subset(df, Cohort=="DKFZ"))
-summary(glm(horvath.age ~ Cluster+sexF+mMGMT, data=subset(df, Cohort=="DKFZ")))
+wrapper(subset(df, Cohort=="DKFZ"))
 
 # ----------------------------- Data Visualization -----------------------------
 ## Combined Boxplots:
@@ -54,10 +56,3 @@ ggplot(mDf, aes(variable, value, color=Cluster)) +
   facet_wrap(~ Cohort) + 
   ylab("Age") +
   THEME_BOX
-
-## Age Acceleration:
-ggplot(df, aes(age, horvath.age, color=Cluster)) +
-  geom_point() +
-  geom_smooth(method="lm", se=FALSE) +
-  facet_wrap(~ Cohort) + 
-  THEME_SCATTER

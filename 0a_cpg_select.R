@@ -13,11 +13,10 @@ ANNOT <- subset(ANNOT, ! Name %in% XREACTIVE$TargetID)
 ## Shared autosomal CpGs across all datasets:
 tcga450 <- load_450k_from_csv(paste0(TCGA_DIR,"GBM/jhu-usc.edu_GBM_HumanMethylation450.betaValue.tsv"))
 dkfz450 <- load_450k_from_csv(paste0(DKFZ_DIR,"GSE103659.txt"))
-norm450 <- load_450k_from_csv(paste0(HEALTHY_DIR, "GSE61431_dasen.csv.gz"))
 
-cpg_shared <- Reduce(intersect, list(rownames(tcga450), rownames(dkfz450), rownames(norm450), ANNOT$Name))
+cpg_shared <- Reduce(intersect, list(rownames(tcga450), rownames(dkfz450), ANNOT$Name))
 length(cpg_shared)
-rm(tcga450, dkfz450, norm450)
+rm(tcga450, dkfz450)
 
 ## Set aside CpGs from gene of interest:
 ANNOT <- subset(ANNOT, Name %in% cpg_shared)
@@ -26,7 +25,7 @@ cpg_list <- subset(ANNOT, grepl(GENE, UCSC_RefGene_Name))
 cpg_list <- cpg_list[order(cpg_list$pos, decreasing=TRUE), ] #gene on rev strand
 nrow(cpg_list)
 
-## Exclude gene of interest & MGMT from shared set:
+## Exclude CpGs in gene of interest & MGMT:
 mgmt_sites <- ANNOT$Name[grepl("MGMT", ANNOT$UCSC_RefGene_Name)]
 cpg_shared <- setdiff(cpg_shared, mgmt_sites)
 cpg_shared <- setdiff(cpg_shared, cpg_list$Name)

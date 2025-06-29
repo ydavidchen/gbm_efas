@@ -16,7 +16,7 @@ pdat_tcga <- patients
 rm(gbm450, gbmGENE, patients)
 
 pdat_tcga <- merge(pdat_tcga, cls, by="Accession")
-CreateTableOne(COVARS, "Cluster", pdat_tcga)
+CreateTableOne(COVARS, "Cluster", pdat_tcga, testNormal=t.test, testExact=fisher.test)
 
 ## DKFZ:
 load(paste0(OUT_DIR, "dkfzgbm_dnam.RData"))
@@ -24,4 +24,4 @@ pdat_dkfz <- patients
 rm(gbm450, gbmGENE, patients)
 
 pdat_dkfz <- merge(pdat_dkfz, cls, by="Accession")
-CreateTableOne(COVARS, "Cluster", pdat_dkfz)
+CreateTableOne(COVARS, "Cluster", pdat_dkfz, testNormal=t.test, testExact=fisher.test)
