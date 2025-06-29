@@ -1,4 +1,5 @@
 # Overall Survival: Kaplan-Meier & CoxPH
+# Note: Run this analysis 1 cohort per script
 
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -37,6 +38,5 @@ surv_pvalue(os_univar) #log-rank test
 ggsurvplot(os_univar, cls, palette=SURV_COLS, ggtheme=THEME_SURV, pval=FALSE, risk.table=FALSE)
 
 ## Cox Model:
-os_multi <- coxph(Surv(os_months, os_status)~Cluster+age+sexF, data=cls)
+os_multi <- coxph(Surv(os_months, os_status)~Cluster+age+sexF+mMGMT, data=cls)
 summary(os_multi)
-exp(cbind(HR=coef(os_multi), confint(os_multi))) #HR & its CI

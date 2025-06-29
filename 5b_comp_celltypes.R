@@ -25,18 +25,9 @@ eda_wrapper <- function(mat) {
   )
 }
 
-# ----------------------- Tumor Purity -----------------------
-purity <- as.data.frame(t(celltypes["Tumor", ]))
-purity <- merge(cls, purity, by.x="Accession", by.y="row.names")
-
-ggplot(purity, aes(Cluster, Tumor)) +
-  geom_boxplot(outlier.shape=NA) +
-  geom_jitter(width=0.25) +
-  facet_wrap(~ Cohort) + 
-  THEME_BOX
-
 # ----------------------- Tumor MicroEnv (TME) Fraction -----------------------
 mat_tme <- celltypes[c("Astrocyte","Dura","Microglia","Neuron","Oligodendrocyte","Endothelium"), ]
+
 eda_wrapper(mat_tme[ , 1:153])
 eda_wrapper(mat_tme[ , 154:ncol(mat_tme)])
 
@@ -49,7 +40,7 @@ ggplot(dfn, aes(Cluster, 100*TME)) +
   geom_boxplot(outlier.shape=NA) +
   geom_jitter(width=0.25) +
   facet_wrap(~ Cohort) + 
-  ylab("Microenvir. Cell %") +
+  ylab("% Neuronal-Stromal Cells") +
   THEME_BOX
 
 ## Univariate tests:
@@ -81,7 +72,6 @@ wrapper_mult("TCGA")
 wrapper_mult("DKFZ")
 
 # ----------------------- Tumor Immune MicroEnv (TME) Fraction -----------------------
-## Total Immune infiltration:
 tils <- celltypes[c("CD4Tcells","CD8Tcells","Bcells","NKcells","Monocytes","Granulocytes","Neutrophils"), ]
 eda_wrapper(tils[ , 1:153])
 eda_wrapper(tils[ , 154:ncol(tils)])
@@ -91,8 +81,21 @@ colnames(dft) <- "Immune"
 dft <- merge(cls, dft, by.x="Accession", by.y="row.names")
 dft$Cohort <- forcats::fct_rev(dft$Cohort)
 
-ggplot(dft, aes(Cluster, Immune)) +
+ggplot(dft, aes(Cluster, 100*Immune)) +
   geom_boxplot(outlier.shape=NA) +
   geom_jitter(width=0.25) +
   facet_wrap(~ Cohort) + 
+  ylab("% Immune Cells") +
   THEME_BOX
+
+# ----------------------- Tumor Purity -----------------------
+purity <- as.data.frame(t(celltypes["Tumor", ]))
+purity <- merge(cls, purity, by.x="Accession", by.y="row.names")
+
+ggplot(purity, aes(Cluster, 100*Tumor)) +
+  geom_boxplot(outlier.shape=NA) +
+  geom_jitter(width=0.25) +
+  facet_wrap(~ Cohort) + 
+  ylab("% Tumor Cells") +
+  THEME_BOX
+

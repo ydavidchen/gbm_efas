@@ -28,13 +28,13 @@ pdat_dkfz <- merge(pdat_dkfz, horvath, by="Accession")
 COL_SELE <- c("Accession","Cohort", "sexF", "Cluster", "age", "horvath.age","mMGMT")
 df <- rbind(pdat_tcga[,COL_SELE], pdat_dkfz[,COL_SELE])
 
+# ----------------------------- Uni & Multivariate Tests -----------------------------
 wrapper <- function(df) {
   mod <- glm(horvath.age ~ (Cluster=="R")+sexF+mMGMT, data=df, family=gaussian)
   print(summary(mod))
   print( rbind(cbind(adjDiff=coef(mod), confint(mod))) )
 }
 
-# ----------------------------- Uni & Multivariate Tests -----------------------------
 ## TCGA:
 t.test(horvath.age ~ Cluster, data=subset(df, Cohort=="TCGA"))
 wrapper(subset(df, Cohort=="TCGA"))
@@ -53,6 +53,6 @@ mDf$variable <- gsub("age", "Chronological", mDf$variable)
 ggplot(mDf, aes(variable, value, color=Cluster)) +
   geom_boxplot(outlier.shape=NA) +
   geom_jitter(position=position_jitterdodge(jitter.width=0.25)) +
-  facet_wrap(~ Cohort) + 
+  facet_wrap(~ Cohort, ncol=1) + 
   ylab("Age") +
   THEME_BOX
