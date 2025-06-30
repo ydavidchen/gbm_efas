@@ -12,9 +12,16 @@ cls <- read.csv(paste0(OUT_DIR,"rpmm_by_cohort.csv"))
 cls <- merge(cls, glb_pc, by.x="Accession", by.y="X")
 cls$Cohort <- forcats::fct_rev(cls$Cohort)
 
+ABLINE <- geom_abline(slope=1, intercept=0, linetype="dashed")
+
 ggplot(cls, aes(PC1, PC2, color=Cluster)) +
   geom_point(size=3, alpha=0.75) +
-  facet_wrap(~ Cohort) + 
+  scale_x_continuous(breaks=seq(-3, 2, 1)) +
+  scale_y_continuous(breaks=seq(-2, 2, 1)) +
+  facet_wrap(~ Cohort, ncol=1) + 
+  ABLINE +
+  annotate("text", -2, 1.1, label="A", size=12, alpha=0.4) +
+  annotate("text", 1, -1, label="B", size=12, alpha=0.4) +
   THEME_SCATTER
 
 ## Univariate tests:

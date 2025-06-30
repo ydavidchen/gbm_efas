@@ -13,21 +13,29 @@ THEME_VOLCANO <- theme_classic() +
 ewas_tcga <- read.csv(paste0(OUT_DIR,"ewas_tcga.csv"), row.names=1)
 ewas_dkfz <- read.csv(paste0(OUT_DIR,"ewas_dkfz.csv"), row.names=1)
 
-wrapper_volcano <- function(df_ewas, xThreshUp=0, xThreshDown=-2.5, textHeight=3, pThresh=0.05, esThresh=0) {
+ADJ_P <- 0.05 / nrow(ewas_tcga)
+ADJ_P 
+
+wrapper_volcano <- function(df_ewas, xThreshDown=-2.5, xThreshUp=1, yThresh=2.4*-log10(ADJ_P),
+                            textHeight=3, pThresh=ADJ_P, esThresh=0) {
   #'@param df_ewas Requires `adj.P.Val` column to be Bonferroni corrected!
   
-  df_ewas$negLog10P <- -log10(df_ewas$adj.P.Val)
+  ## Operate on transformed Raw P only:
+  df_ewas$adj.P.Val <- NULL 
+  
+  ## Use Raw P value for visualization:
+  df_ewas$negLog10P <- -log10(df_ewas$P.Value)
   
   ## Label for direction of change:
-  df_ewas$dir[df_ewas$adj.P.Val < pThresh & df_ewas$logFC > esThresh] <- "Positive"
-  df_ewas$dir[df_ewas$adj.P.Val < pThresh & df_ewas$logFC < -esThresh] <- "Negative"
+  df_ewas$dir[df_ewas$P.Value < pThresh & df_ewas$logFC > esThresh] <- "Positive"
+  df_ewas$dir[df_ewas$P.Value < pThresh & df_ewas$logFC < -esThresh] <- "Negative"
   df_ewas$dir[is.na(df_ewas$dir)] <- ""
   
   ## Add per-group N:
-  nPos <- sum(df_ewas$dir=="Positive", na.rm=TRUE)
-  nNeg <- sum(df_ewas$dir=="Negative", na.rm=TRUE)
+  num_pos <- sum(df_ewas$dir=="Positive", na.rm=TRUE)
+  num_neg <- sum(df_ewas$dir=="Negative", na.rm=TRUE)
   
-  ## Label CpGs w/ large effect sizes:
+  ## Label CpGs w/ largest effect sizes:
   dmp_genes <- as.character(df_ewas$UCSC_RefGene_Name)
   dmp_genes <- strsplit(dmp_genes, split=";")
   df_ewas$Gene <- rep(NA, length(dmp_genes))
@@ -41,35 +49,34 @@ wrapper_volcano <- function(df_ewas, xThreshUp=0, xThreshDown=-2.5, textHeight=3
       df_ewas$Gene[k] <- NA
     }
   }
+  
   df_ewas$Label <- df_ewas$Gene
   
-  ## Remove gene-name texts below threshold:
-  df_ewas$Label[(df_ewas$logFC <= xThreshUp & df_ewas$logFC >= xThreshDown) | df_ewas$adj.P.Val >= pThresh] <- NA #higher threshold for gene labeling
-
+  ## Remove some gene-name texts using higher thresholds:
+  df_ewas$Label[df_ewas$P.Value > pThresh] <- NA
+  df_ewas$Label[df_ewas$logFC > xThreshDown & df_ewas$logFC < xThreshUp] <- NA 
+  df_ewas$Label[df_ewas$negLog10P > yThresh] <- df_ewas$Gene[df_ewas$negLog10P > yThresh] #recover most signif
+  
   ## Auto-determine text position & axis range/ticks:
-  yHoriz <- -log10(pThresh / nrow(df_ewas)) #Undo Bonferroni & then transform
   hMax <- max(df_ewas$negLog10P)
   lMax <- min(df_ewas$logFC)
   rMax <- max(df_ewas$logFC)
   
-  plt <- ggplot(df_ewas, aes(x=logFC, y=-log10(P.Value), color=dir)) +
+  plt <- ggplot(df_ewas, aes(x=logFC, y=negLog10P, color=dir)) +
     geom_point(aes(size=dir, alpha=dir)) + #override
     scale_color_manual(values = c("gray","royalblue","red")) +
-    scale_size_manual(values=c(1, 1.1, 1.1)) +
-    scale_alpha_manual(values=c(0.9, 1, 1)) +
+    scale_size_manual(values=c(0.75, 1, 1)) +
+    scale_alpha_manual(values=c(0.75, 1, 1)) +
     geom_text_repel(aes(label=Label), color="black", size=4) +
-    geom_hline(yintercept=yHoriz, linetype="dashed") +
-    labs(x="Log2 Fold Diff.", y="-log10(raw P)") +
-    annotate("text", rMax/2, hMax+0.5,  label=paste(nPos,"HYPER \n in Cluster R"), size=6, color="red") +
-    annotate("text", lMax/2, hMax+0.5, label=paste(nNeg,"HYPO \n in Cluster R"), size=6, color="royalblue") +
+    geom_hline(yintercept=-log10(ADJ_P), linetype="dashed") +
+    labs(x="Log2 Fold Diff.", y="-log10(P-value)") +
+    annotate("text", rMax/2, hMax+0.5,  label=paste(num_pos,"HYPER \n in Cluster R"), size=6, color="red") +
+    annotate("text", lMax/2, hMax+0.5, label=paste(num_neg,"HYPO \n in Cluster R"), size=6, color="royalblue") +
     THEME_VOLCANO
   
-  if(esThresh == 0) 
-    plt <- plt + geom_vline(xintercept=c(esThresh), linetype="dashed")
-  else 
-    plt <- plt + geom_vline(xintercept=c(-esThresh, esThresh), linetype="dashed")
+  if(esThresh != 0) plt <- plt + geom_vline(xintercept=c(-esThresh, esThresh), linetype="dashed")
   return(plt)
 }
 
-wrapper_volcano(ewas_tcga)
-wrapper_volcano(ewas_dkfz)
+wrapper_volcano(ewas_tcga, -2.50)
+wrapper_volcano(ewas_dkfz, -2.15)
