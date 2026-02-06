@@ -31,7 +31,7 @@ An interactive dashboard of crucial measures, analogous to "KPIs" in business se
 
 
 <html>
-<div class='tableauPlaceholder' id='viz1770393353259' style='position: relative; width: 25%; height:25%'>
+<div class='tableauPlaceholder' id='viz1770393353259' style='width: 25%; height:25%;'>
     <noscript>
         <a href='#'><img alt='Final ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;ef&#47;efas&#47;Final&#47;1_rss.png' style='border: none' /></a>
     </noscript>
