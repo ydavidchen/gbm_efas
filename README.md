@@ -31,7 +31,7 @@ An interactive dashboard of crucial measures, analogous to "KPIs" in business se
 
 
 <html>
-<div class='tableauPlaceholder' id='viz1770393353259' style='position: relative'>
+<div class='tableauPlaceholder' id='viz1770393353259' style='position: relative; width: 25%; height:25%'>
     <noscript>
         <a href='#'><img alt='Final ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;ef&#47;efas&#47;Final&#47;1_rss.png' style='border: none' /></a>
     </noscript>
@@ -52,9 +52,6 @@ An interactive dashboard of crucial measures, analogous to "KPIs" in business se
         <param name='filter' value='publish=yes' />
     </object>
 </div>
-<script type='text/javascript'>
-    var divElement = document.getElementById('viz1770393353259');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else { vizElement.style.width='100%';vizElement.style.height='2427px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);
-</script>
 </html>
 
 ### Responsible Use
